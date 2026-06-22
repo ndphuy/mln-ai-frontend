@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { 
-  BookOpen, 
-  Sparkles, 
-  Building2, 
-  TrendingUp, 
-  Award, 
-  Layers, 
+import {
+  BookOpen,
+  Sparkles,
+  Building2,
+  TrendingUp,
+  Award,
+  Layers,
   Home,
   UploadCloud,
   Globe
@@ -23,10 +23,16 @@ import TabQuiz from "@/components/TabQuiz";
 import ChatDrawer from "@/components/ChatDrawer";
 import UploadModal from "@/components/UploadModal";
 
-// --- Types ---
+export interface SourceChunk {
+  document: string;
+  chunk_id: string;
+  snippet: string;
+}
+
 interface Message {
   role: "user" | "assistant";
   content: string;
+  sources?: SourceChunk[];
 }
 
 interface QuizQuestion {
@@ -62,8 +68,9 @@ export default function PresentationApp() {
   // Check health and keep checking every 10 seconds
   useEffect(() => {
     const checkHealth = async () => {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
       try {
-        const response = await fetch("http://localhost:8000/health");
+        const response = await fetch(`${baseUrl}/health`);
         if (response.ok) {
           setIsBackendHealthy(true);
         } else {
@@ -109,8 +116,10 @@ export default function PresentationApp() {
     setUserInput("");
     setIsChatLoading(true);
 
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
     try {
-      const response = await fetch("http://localhost:8000/api/chat", {
+      const response = await fetch(`${baseUrl}/api/chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -133,15 +142,15 @@ export default function PresentationApp() {
 
       setChatMessages([
         ...newMessages,
-        { role: "assistant" as const, content: data.answer }
+        { role: "assistant" as const, content: data.answer, sources: data.sources }
       ]);
     } catch (err: any) {
       console.error(err);
       setChatMessages([
         ...newMessages,
-        { 
-          role: "assistant" as const, 
-          content: "❌ Lỗi kết nối: Tôi không thể liên lạc với máy chủ AI Backend. Hãy kiểm tra lại backend có đang chạy tại http://localhost:8000 không." 
+        {
+          role: "assistant" as const,
+          content: `❌ Lỗi kết nối: Tôi không thể liên lạc với máy chủ AI Backend. Hãy kiểm tra lại backend có đang chạy tại ${baseUrl} không.`
         }
       ]);
     } finally {
@@ -156,13 +165,15 @@ export default function PresentationApp() {
     setShowQuizResult({});
     setQuizDocUsed(null);
 
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
     try {
-      const response = await fetch(`http://localhost:8000/api/questions/generate?num_questions=${num}&level=${level}`);
+      const response = await fetch(`${baseUrl}/api/questions/generate?num_questions=${num}&level=${level}`);
       if (!response.ok) {
         throw new Error("Không thể sinh câu hỏi từ Backend.");
       }
       const data = await response.json();
-      
+
       // Parse response to fit UI schema
       const formatted: QuizQuestion[] = data.questions.map((q: any) => ({
         id: q.id,
@@ -214,7 +225,7 @@ export default function PresentationApp() {
 
   return (
     <div className="flex-1 flex flex-col bg-charcoal-dark text-foreground min-h-screen relative font-sans">
-      
+
       {/* Background patterns */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(153,27,27,0.15),transparent_50%)] pointer-events-none" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(180,83,9,0.08),transparent_50%)] pointer-events-none" />
@@ -222,7 +233,7 @@ export default function PresentationApp() {
       {/* TOP HEADER WITH INTEGRATED TABS */}
       <header className="sticky top-0 border-b border-crimson/20 bg-neutral-950/80 backdrop-blur-md z-10">
         <div className="max-w-[1440px] mx-auto h-20 flex items-center justify-between px-6 gap-4">
-          
+
           {/* Logo & Info */}
           <div className="flex items-center gap-3 shrink-0">
             <div className="h-9 w-9 bg-gradient-to-br from-crimson to-gold rounded-lg flex items-center justify-center shadow-lg shadow-crimson/20">
@@ -234,24 +245,24 @@ export default function PresentationApp() {
                   Kinh tế chính trị Mác - Lênin
                 </h1>
                 {/* Health Indicator Dot */}
-                <div 
-                  className={`h-2.5 w-2.5 rounded-full ${
-                    isBackendHealthy === null 
-                      ? "bg-neutral-600 animate-pulse" 
-                      : isBackendHealthy 
-                      ? "bg-emerald-500 shadow-md shadow-emerald-500/50" 
+                <div
+                  className={`h-2.5 w-2.5 rounded-full ${isBackendHealthy === null
+                    ? "bg-neutral-600 animate-pulse"
+                    : isBackendHealthy
+                      ? "bg-emerald-500 shadow-md shadow-emerald-500/50"
                       : "bg-red-500 shadow-md shadow-red-500/50"
-                  }`} 
+                    }`}
                   title={
-                    isBackendHealthy === null 
-                      ? "Đang kiểm tra kết nối Backend..." 
-                      : isBackendHealthy 
-                      ? "Backend hoạt động tốt" 
-                      : "Mất kết nối Backend!"
+                    isBackendHealthy === null
+                      ? "Đang kiểm tra kết nối Backend..."
+                      : isBackendHealthy
+                        ? "Backend hoạt động tốt"
+                        : "Mất kết nối Backend!"
                   }
                 />
               </div>
-              <p className="text-[10px] text-neutral-400">Chương 3: Tuần Hoàn & Chu Chuyển Tư Bản</p>
+              <p className="text-[10px] text-neutral-400">Chương 3:GIÁ TRỊ THẶNG DƯ
+                TRONG NỀN KINH TẾ THỊ TRƯỜNG</p>
             </div>
           </div>
 
@@ -265,11 +276,10 @@ export default function PresentationApp() {
                   <button
                     key={idx}
                     onClick={() => setActiveTab(idx)}
-                    className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs md:text-sm font-semibold tracking-wide transition-all duration-300 cursor-pointer shrink-0 ${
-                      isActive 
-                        ? "bg-crimson text-white shadow-md shadow-crimson/20" 
-                        : "text-neutral-400 hover:text-white hover:bg-neutral-900/50"
-                    }`}
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs md:text-sm font-semibold tracking-wide transition-all duration-300 cursor-pointer shrink-0 ${isActive
+                      ? "bg-crimson text-white shadow-md shadow-crimson/20"
+                      : "text-neutral-400 hover:text-white hover:bg-neutral-900/50"
+                      }`}
                   >
                     <IconComponent className="h-4 w-4" />
                     <span className="hidden sm:inline">{tab.label}</span>
@@ -282,15 +292,6 @@ export default function PresentationApp() {
 
           {/* AI & Upload Controls */}
           <div className="shrink-0 flex items-center gap-2">
-            {/* Upload Document Icon */}
-            <button
-              onClick={() => setIsUploadOpen(true)}
-              className="p-2 rounded-lg bg-neutral-900 hover:bg-neutral-850 border border-neutral-800 hover:border-neutral-700 text-neutral-400 hover:text-white transition-all cursor-pointer"
-              title="Nạp thêm tài liệu học tập"
-            >
-              <UploadCloud className="h-4.5 w-4.5" />
-            </button>
-
             {/* AI Toggle Button */}
             <button
               onClick={() => setIsChatOpen(!isChatOpen)}
@@ -312,8 +313,8 @@ export default function PresentationApp() {
           {activeTab === 3 && <TabAnalysis onQuickPrompt={handleQuickPrompt} />}
           {activeTab === 4 && <TabLesson />}
           {activeTab === 5 && (
-            <TabQuiz 
-              quizQuestions={quizQuestions} 
+            <TabQuiz
+              quizQuestions={quizQuestions}
               selectedAnswers={selectedAnswers}
               showQuizResult={showQuizResult}
               onAnswer={handleQuizAnswer}
@@ -327,8 +328,8 @@ export default function PresentationApp() {
       </main>
 
       {/* CHAT AI SLIDE-OUT PANEL (DRAWER) */}
-      <ChatDrawer 
-        isOpen={isChatOpen} 
+      <ChatDrawer
+        isOpen={isChatOpen}
         onClose={() => setIsChatOpen(false)}
         messages={chatMessages}
         isLoading={isChatLoading}
@@ -346,9 +347,9 @@ export default function PresentationApp() {
       />
 
       {/* DOCUMENT UPLOAD POPUP MODAL */}
-      <UploadModal 
-        isOpen={isUploadOpen} 
-        onClose={() => setIsUploadOpen(false)} 
+      <UploadModal
+        isOpen={isUploadOpen}
+        onClose={() => setIsUploadOpen(false)}
       />
     </div>
   );

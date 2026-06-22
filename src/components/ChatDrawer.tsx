@@ -1,11 +1,18 @@
 "use client";
 
 import React from "react";
-import { Sparkles, X, MessageSquare, RotateCcw, Send } from "lucide-react";
+import { Sparkles, X, MessageSquare, RotateCcw, Send, BookOpen } from "lucide-react";
+
+export interface SourceChunk {
+  document: string;
+  chunk_id: string;
+  snippet: string;
+}
 
 interface Message {
   role: "user" | "assistant";
   content: string;
+  sources?: SourceChunk[];
 }
 
 interface ChatDrawerProps {
@@ -19,6 +26,13 @@ interface ChatDrawerProps {
   onClearChat: () => void;
   chatEndRef: React.RefObject<HTMLDivElement | null>;
 }
+const formatDocName = (docName: string) => {
+  const match = docName.match(/^page_?(\d+)(\.txt|\.pdf|\.docx)?$/i);
+  if (match) {
+    return `trang ${match[1]}`;
+  }
+  return docName.replace(/\.[^/.]+$/, "").replace(/_/g, " ");
+};
 
 export default function ChatDrawer({
   isOpen,
@@ -83,15 +97,29 @@ export default function ChatDrawer({
                   }`}
                 >
                   <span className="whitespace-pre-wrap">{msg.content}</span>
+
+                  {msg.role === "assistant" && msg.sources && msg.sources.length > 0 && (
+                    <div className="mt-3 pt-2 border-t border-neutral-850 flex flex-wrap items-center gap-1.5">
+                      <span className="text-[10px] text-neutral-500 font-semibold uppercase tracking-wider">Nguồn:</span>
+                      {Array.from(new Set(msg.sources.map(src => src.document))).map((doc, docIdx) => (
+                        <span
+                          key={docIdx}
+                          title={doc}
+                          className="inline-flex items-center gap-1 px-2 py-0.5 bg-neutral-950 border border-neutral-800/80 text-[10px] text-neutral-300 rounded-md font-medium capitalize"
+                        >
+                          <BookOpen className="h-2.5 w-2.5 text-crimson-bright shrink-0" />
+                          {formatDocName(doc)}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 <span className="text-[9px] text-neutral-500 mt-1 px-1">
                   {msg.role === "user" ? "Học sinh" : "Trợ lý AI"}
                 </span>
               </div>
             ))
-          )}
-
-          {/* Loading Indicator */}
+          )}          {/* Loading Indicator */}
           {isLoading && (
             <div className="flex items-center gap-2 p-3 mr-auto max-w-[85%] bg-neutral-900 border border-neutral-800 rounded-2xl rounded-bl-none">
               <div className="flex gap-1">

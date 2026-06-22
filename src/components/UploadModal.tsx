@@ -67,8 +67,10 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
     const formData = new FormData();
     formData.append("file", file);
 
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
     try {
-      const response = await fetch("http://localhost:8000/api/documents/upload", {
+      const response = await fetch(`${baseUrl}/api/documents/upload`, {
         method: "POST",
         body: formData,
       });
