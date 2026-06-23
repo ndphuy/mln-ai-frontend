@@ -16,7 +16,7 @@ export default function TabHome({ onNext }: TabHomeProps) {
       </div>
       <h2 className="text-4xl md:text-6xl font-extrabold tracking-tight leading-tight text-white">
         LÝ LUẬN CỦA C. MÁC VỀ <br />
-        <span className="bg-gradient-to-r from-crimson-bright via-gold-bright to-amber-400 bg-clip-text text-transparent">
+        <span className="bg-gradient-to-r from-crimson via-crimson-bright to-gold bg-clip-text text-transparent">
           TUẦN HOÀN TƯ BẢN
         </span>
       </h2>

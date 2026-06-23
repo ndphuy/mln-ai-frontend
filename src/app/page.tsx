@@ -145,7 +145,7 @@ export default function PresentationApp() {
         { role: "assistant" as const, content: data.answer, sources: data.sources }
       ]);
     } catch (err: any) {
-      console.error(err);
+      console.error("Chat backend connection error:", err.message || err);
       setChatMessages([
         ...newMessages,
         {
@@ -184,8 +184,8 @@ export default function PresentationApp() {
       }));
       setQuizQuestions(formatted);
       setQuizDocUsed(data.document_used || "Tài liệu hệ thống");
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      console.error("Quiz backend connection error:", err.message || err);
       alert("❌ Lỗi: Không thể tải câu hỏi từ Backend AI. Hãy chắc chắn rằng bạn đã upload tài liệu giáo trình vào backend trước.");
     } finally {
       setIsGeneratingQuiz(false);
@@ -241,7 +241,7 @@ export default function PresentationApp() {
             </div>
             <div className="hidden md:block">
               <div className="flex items-center gap-2">
-                <h1 className="font-bold text-sm tracking-wide uppercase bg-gradient-to-r from-white via-neutral-200 to-crimson-bright bg-clip-text text-transparent">
+                <h1 className="font-bold text-sm tracking-wide uppercase bg-gradient-to-r from-neutral-100 via-neutral-300 to-crimson-bright bg-clip-text text-transparent">
                   Kinh tế chính trị Mác - Lênin
                 </h1>
                 {/* Health Indicator Dot */}
