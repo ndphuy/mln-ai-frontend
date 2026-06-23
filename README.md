@@ -1,6 +1,5 @@
 https://mln-ai-frontend-lovat.vercel.app/
 
-<img width="838" height="782" alt="image" src="https://github.com/user-attachments/assets/cfda11b2-8f15-45ee-81ae-981ed1217f35" />
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
